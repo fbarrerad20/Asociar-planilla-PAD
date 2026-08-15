@@ -1,5 +1,5 @@
-streamlit==1.28.1
-pandas==2.0.3
-openpyxl==3.1.2
-rapidfuzz==3.1.1
-holidays==0.34
+streamlit>=1.35.0
+pandas>=2.1.0
+openpyxl>=3.1.0
+rapidfuzz>=3.3.0
+holidays>=0.35
