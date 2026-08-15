@@ -21,8 +21,8 @@ import tempfile
 import os
 
 # Configurar la página
-st.set_page_config(page_title="Gestor de Emisiones Otoacústicas", layout="wide")
-st.title("📊 Gestor de Emisiones Otoacústicas")
+st.set_page_config(page_title="Asociar pacientes PAD", layout="wide")
+st.title("📊 Asociar pacientes PAD")
 st.markdown("Cruza profesionales, detecta días inhábiles y genera reportes automáticos")
 
 # Configuración de correo (en el sidebar)
