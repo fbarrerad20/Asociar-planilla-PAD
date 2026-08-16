@@ -217,16 +217,9 @@ RESUMEN POR PROFESIONAL:
 ─────────────────────────────────────────────────────────
 """
 
-    for prof in sorted(resultado['resumen_profesionales'].keys()):
+   for prof in sorted(resultado['resumen_profesionales'].keys()):
         stats = resultado['resumen_profesionales'][prof]
         cuerpo += f"{prof:30} | Total: {stats['total']:3} | Hábiles: {stats['habil']:3} | Inhábiles: {stats['inhabil']:3}\n"
-
-    if resultado['examenes_inhabiles']:
-        cuerpo += "\nDETALLE DE EXÁMENES EN DÍAS INHÁBILES:\n"
-        cuerpo += "─────────────────────────────────────────────────────────\n"
-        for exam in resultado['examenes_inhabiles']:
-            fecha_str = exam['fecha'].strftime('%Y-%m-%d (%A)') if hasattr(exam['fecha'], 'strftime') else str(exam['fecha'])
-            cuerpo += f"{fecha_str} | {exam['profesional']} | {exam['madre']}\n"
 
     cuerpo += "\n\nNotas:\n"
     cuerpo += "🟨 Amarillo en PROFESIONAL = Examen en día inhábil (doble pago) o búsqueda por nombre\n"
