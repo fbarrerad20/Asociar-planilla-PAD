@@ -25,28 +25,14 @@ st.set_page_config(page_title="Asociar pacientes PAD", layout="wide")
 st.title("📊 Asociar pacientes PAD")
 st.markdown("Cruza profesionales, detecta días inhábiles y genera reportes automáticos")
 
-# Configuración de correo (en el sidebar)
-st.sidebar.header("⚙️ Configuración")
-st.sidebar.info("""
-**Credenciales de correo:**
-Para usar Gmail, necesitas una contraseña de aplicación.
-[Instrucciones aquí](https://support.google.com/accounts/answer/185833)
-""")
-
-remitente_email = st.sidebar.text_input(
-    "Correo remitente (Gmail/Outlook):",
-    value="",
-    type="password",
-    key="email_input"
-)
-remitente_password = st.sidebar.text_input(
-    "Contraseña de aplicación:",
-    value="",
-    type="password",
-    key="password_input"
-)
-destinatario_email = "f.barrerad20@gmail.com"
-st.sidebar.write(f"📧 Reportes se enviarán a: {destinatario_email}")
+# Leer credenciales desde Streamlit Secrets
+try:
+    remitente_email = st.secrets["GMAIL_EMAIL"]
+    remitente_password = st.secrets["GMAIL_PASSWORD"]
+    destinatario_email = st.secrets["DESTINATARIO"]
+except KeyError:
+    st.error("⚠️ Error: Las credenciales de correo no están configuradas en Streamlit Secrets")
+    st.stop()
 
 # Funciones auxiliares
 def normalizar_nombre(nombre):
@@ -371,28 +357,22 @@ if archivo_datos and archivo_rellenar:
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
 
-                # Enviar correo
-                st.subheader("📧 Enviar reporte")
-                if remitente_email and remitente_password:
-                    if st.button("Enviar correo a fiscalización"):
-                        with st.spinner("Enviando correo..."):
-                            asunto = f"Reporte de Emisiones Otoacústicas - {datetime.now().strftime('%Y-%m-%d')}"
-                            cuerpo = generar_cuerpo_correo(resultado, archivo_rellenar.name)
-                            exito, mensaje = enviar_correo(
-                                remitente_email,
-                                remitente_password,
-                                destinatario_email,
-                                asunto,
-                                cuerpo,
-                                ruta_salida
-                            )
-                            if exito:
-                                st.success(f"✅ {mensaje}")
-                            else:
-                                st.error(f"❌ {mensaje}")
-                else:
-                    st.warning("⚠️ Configura tus credenciales de correo en el panel de la izquierda para enviar reportes")
-
+                # Enviar correo automáticamente
+                with st.spinner("Enviando reporte por correo..."):
+                    asunto = f"Reporte de Emisiones Otoacústicas - {datetime.now().strftime('%Y-%m-%d')}"
+                    cuerpo = generar_cuerpo_correo(resultado, archivo_rellenar.name)
+                    exito, mensaje = enviar_correo(
+                        remitente_email,
+                        remitente_password,
+                        destinatario_email,
+                        asunto,
+                        cuerpo,
+                        ruta_salida
+                    )
+                    if exito:
+                        st.info("✓ Reporte enviado automáticamente")
+                    else:
+                        st.warning(f"⚠️ Error al enviar reporte: {mensaje}")
                 # Limpiar archivos temporales
                 os.unlink(ruta_datos)
                 os.unlink(ruta_rellenar)
