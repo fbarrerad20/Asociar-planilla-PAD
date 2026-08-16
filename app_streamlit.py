@@ -188,10 +188,13 @@ def generar_excel_procesado(resultado, archivo_salida):
             break
 
     if prof_col:
+    gray_fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
         for row_idx, (metodo, inhabil) in enumerate(zip(resultado['metodo_llenado'], resultado['es_inhabil']), start=2):
-            cell = ws.cell(row=row_idx, column=prof_col)
-            if inhabil or 'NOMBRE' in metodo:
-                cell.fill = yellow_fill
+        cell = ws.cell(row=row_idx, column=prof_col)
+            if inhabil:
+               cell.fill = yellow_fill
+            elif 'NOMBRE' in metodo:
+                cell.fill = gray_fill
             elif 'NO_ENCONTRADO' in metodo:
                 cell.fill = orange_fill
 
