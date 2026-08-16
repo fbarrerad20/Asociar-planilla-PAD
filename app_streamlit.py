@@ -180,6 +180,7 @@ def generar_excel_procesado(resultado, archivo_salida):
 
     yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
     orange_fill = PatternFill(start_color="FFA500", end_color="FFA500", fill_type="solid")
+    gray_fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
 
     prof_col = None
     for col_idx, cell in enumerate(ws[1], 1):
@@ -188,15 +189,14 @@ def generar_excel_procesado(resultado, archivo_salida):
             break
 
     if prof_col:
-    gray_fill = PatternFill(start_color="D3D3D3", end_color="D3D3D3", fill_type="solid")
-    for row_idx, (metodo, inhabil) in enumerate(zip(resultado['metodo_llenado'], resultado['es_inhabil']), start=2):
-        cell = ws.cell(row=row_idx, column=prof_col)
-        if inhabil:
-            cell.fill = yellow_fill
-        elif 'NOMBRE' in metodo:
-            cell.fill = gray_fill
-        elif 'NO_ENCONTRADO' in metodo:
-            cell.fill = orange_fill
+        for row_idx, (metodo, inhabil) in enumerate(zip(resultado['metodo_llenado'], resultado['es_inhabil']), start=2):
+            cell = ws.cell(row=row_idx, column=prof_col)
+            if inhabil:
+                cell.fill = yellow_fill
+            elif 'NOMBRE' in metodo:
+                cell.fill = gray_fill
+            elif 'NO_ENCONTRADO' in metodo:
+                cell.fill = orange_fill
 
     wb.save(archivo_salida)
 
@@ -225,7 +225,8 @@ def generar_cuerpo_correo(resultado, nombre_archivo):
 
     lineas.append("")
     lineas.append("Notas:")
-    lineas.append("🟨 Amarillo en PROFESIONAL = Examen en día inhábil (doble pago) o búsqueda por nombre")
+    lineas.append("🟨 Amarillo en PROFESIONAL = Examen en día inhábil (doble pago)")
+    lineas.append("⬜ Gris en PROFESIONAL = Encontrada por búsqueda de nombre (revisar)")
     lineas.append("🟠 Naranja en PROFESIONAL = No encontrado en bases de datos")
 
     return "\n".join(lineas)
@@ -369,6 +370,7 @@ if archivo_datos and archivo_rellenar:
                         st.info("✓ Reporte enviado automáticamente")
                     else:
                         st.warning(f"⚠️ Error al enviar reporte: {mensaje}")
+
                 # Limpiar archivos temporales
                 os.unlink(ruta_datos)
                 os.unlink(ruta_rellenar)
