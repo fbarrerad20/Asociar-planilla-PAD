@@ -199,33 +199,33 @@ def generar_excel_procesado(resultado, archivo_salida):
 
 def generar_cuerpo_correo(resultado, nombre_archivo):
     """Genera el cuerpo del correo con el resumen."""
-    cuerpo = f"""
-Reporte de Emisiones Otoacústicas
-Generado: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    lineas = []
+    lineas.append("Reporte de Emisiones Otoacústicas")
+    lineas.append(f"Generado: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    lineas.append("")
+    lineas.append(f"Archivo: {nombre_archivo}")
+    lineas.append("")
+    lineas.append("ESTADÍSTICAS GENERALES:")
+    lineas.append("─────────────────────────────────────────────────────────")
+    lineas.append(f"Total de exámenes procesados: {len(resultado['df'])}")
+    lineas.append(f"Encontrados por RUT: {sum(1 for m in resultado['metodo_llenado'] if 'RUT_' in m)}")
+    lineas.append(f"Encontrados por nombre: {sum(1 for m in resultado['metodo_llenado'] if 'NOMBRE' in m)}")
+    lineas.append(f"No encontrados: {resultado['metodo_llenado'].count('NO_ENCONTRADO')}")
+    lineas.append(f"Exámenes en días inhábiles (doble pago): {sum(resultado['es_inhabil'])}")
+    lineas.append("")
+    lineas.append("RESUMEN POR PROFESIONAL:")
+    lineas.append("─────────────────────────────────────────────────────────")
 
-Archivo: {nombre_archivo}
-
-ESTADÍSTICAS GENERALES:
-─────────────────────────────────────────────────────────
-Total de exámenes procesados: {len(resultado['df'])}
-Encontrados por RUT: {sum(1 for m in resultado['metodo_llenado'] if 'RUT_' in m)}
-Encontrados por nombre: {sum(1 for m in resultado['metodo_llenado'] if 'NOMBRE' in m)}
-No encontrados: {resultado['metodo_llenado'].count('NO_ENCONTRADO')}
-Exámenes en días inhábiles (doble pago): {sum(resultado['es_inhabil'])}
-
-RESUMEN POR PROFESIONAL:
-─────────────────────────────────────────────────────────
-"""
-
-   for prof in sorted(resultado['resumen_profesionales'].keys()):
+    for prof in sorted(resultado['resumen_profesionales'].keys()):
         stats = resultado['resumen_profesionales'][prof]
-        cuerpo += f"{prof:30} | Total: {stats['total']:3} | Hábiles: {stats['habil']:3} | Inhábiles: {stats['inhabil']:3}\n"
+        lineas.append(f"{prof:30} | Total: {stats['total']:3} | Hábiles: {stats['habil']:3} | Inhábiles: {stats['inhabil']:3}")
 
-    cuerpo += "\n\nNotas:\n"
-    cuerpo += "🟨 Amarillo en PROFESIONAL = Examen en día inhábil (doble pago) o búsqueda por nombre\n"
-    cuerpo += "🟠 Naranja en PROFESIONAL = No encontrado en bases de datos\n"
+    lineas.append("")
+    lineas.append("Notas:")
+    lineas.append("🟨 Amarillo en PROFESIONAL = Examen en día inhábil (doble pago) o búsqueda por nombre")
+    lineas.append("🟠 Naranja en PROFESIONAL = No encontrado en bases de datos")
 
-    return cuerpo
+    return "\n".join(lineas)
 
 def enviar_correo(remitente, password, destinatario, asunto, cuerpo, archivo_excel):
     """Envía un correo con el archivo adjunto."""
